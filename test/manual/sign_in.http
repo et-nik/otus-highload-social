@@ -1,0 +1,14 @@
+POST {{host}}/sign-in
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test"
+}
+
+> {%
+
+var body = JSON.parse(response.body);
+client.global.set('authToken', body.auth_token);
+
+%}

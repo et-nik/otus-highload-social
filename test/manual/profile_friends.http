@@ -1,0 +1,2 @@
+GET {{host}}/profile/friends
+Authorization: Bearer 1|03b98c1570deb4a2ed112071feb0ce62ea26121f2a13f913bce7e0ddeda5f166

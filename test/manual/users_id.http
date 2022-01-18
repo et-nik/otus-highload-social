@@ -1,0 +1,2 @@
+GET {{host}}/users/1
+Authorization: Bearer {{authToken}}

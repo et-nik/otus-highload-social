@@ -1,0 +1,2 @@
+GET {{host}}/users/1/friends
+Authorization: Bearer {{authToken}}

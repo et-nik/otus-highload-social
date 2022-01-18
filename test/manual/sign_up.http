@@ -1,0 +1,46 @@
+POST {{host}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test",
+  "name": "Name",
+  "surname": "Surname",
+  "age": 30,
+  "sex": "male",
+  "interests": ["cars","pets"],
+  "city": "Saint-Petersburg"
+}
+
+
+###
+
+POST {{host}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "test2@example.com",
+  "password": "test",
+  "name": "Name2",
+  "surname": "Surname2",
+  "age": 40,
+  "sex": "male",
+  "interests": ["planes"],
+  "city": "Moscow"
+}
+
+###
+
+POST {{host}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "test3@example.com",
+  "password": "test",
+  "name": "Name3",
+  "surname": "Surname3",
+  "age": 50,
+  "sex": "male",
+  "interests": ["nothing"],
+  "city": "Moscow"
+}
