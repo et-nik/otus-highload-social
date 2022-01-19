@@ -19,7 +19,8 @@
         <td>{{user.sex}}</td>
         <td>{{user.city}}</td>
         <td>
-          <button v-if="!isUserFollowed(user.id)" @click="follow(user.id)">Follow</button>
+          <button v-if="!isUserFollowed(user.id) && !isCurrentUser(user.id)" @click="follow(user.id)">Follow</button>
+          <span v-else-if="isCurrentUser(user.id)">You</span>
           <span v-else>Followed</span>
         </td>
       </tr>
@@ -46,6 +47,9 @@ export default {
           .catch(err => {
             console.log(err)
           })
+    },
+    isCurrentUser: function(id) {
+      return this.profile.id === id
     },
     isUserFollowed: function(id) {
       if (this.profile.friends === null) {

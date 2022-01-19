@@ -76,6 +76,16 @@ export default {
   },
   methods: {
     register: function() {
+      let interests = []
+
+      if (this.interests !== null && this.interests !== "") {
+          interests = this.interests.split(",")
+      }
+
+      interests.forEach(function(part, index, arr) {
+        arr[index] = arr[index].trim();
+      });
+
       let data = {
         name: this.name,
         surname: this.surname,
@@ -84,7 +94,7 @@ export default {
         age: this.age,
         city: this.city,
         sex: this.sex,
-        //interests: this.interests,
+        interests: interests,
       };
       this.$store
           .dispatch("register", data)
