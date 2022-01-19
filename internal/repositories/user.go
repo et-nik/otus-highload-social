@@ -173,6 +173,10 @@ func (repository *UserRepository) updateFriends(ctx context.Context, user *domai
 	var vals []interface{}
 	valuesStr := ""
 
+	if len(user.Friends) == 0 {
+		return nil
+	}
+
 	for _, friendID := range user.Friends {
 		valuesStr += "(?, ?),"
 		vals = append(vals, user.ID, friendID)

@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
 
-axios.defaults.baseURL = 'http://localhost:18000'
+axios.defaults.baseURL = 'http://otus-social.knik.space'
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 const token = localStorage.getItem('token')
@@ -57,7 +57,11 @@ export default createStore({
             state.user = data
         },
         append_friends(state, id) {
-            state.user.friends.push(id)
+            if (state.user.friends == null) {
+                state.user.friends = [id]
+            } else {
+                state.user.friends.push(id)
+            }
 
             localStorage.setItem('user', JSON.stringify(state.user))
         }
@@ -102,14 +106,24 @@ export default createStore({
                 axios({ url: '/sign-up', data: user, method: 'POST', mode: 'no-cors'})
                     .then(resp => {
                         const token = resp.data.token
-                        const user = resp.data.user
+                        const user = {
+                            id: resp.data.user.id,
+                            email: resp.data.user.email,
+                            name: resp.data.user.name,
+                            surname: resp.data.user.surname,
+                            age: resp.data.user.age,
+                            sex: resp.data.user.sex,
+                            city: resp.data.user.city,
+                            interests: resp.data.user.interests,
+                            friends: resp.data.user.friends,
+                        }
 
                         localStorage.setItem('token', token)
                         localStorage.setItem('user', JSON.stringify(user))
 
                         axios.defaults.headers.common['Authorization'] = "Bearer " + token
 
-                        commit('auth_success', token, user)
+                        commit('auth_success', {token, user})
                         resolve(resp)
                     })
                     .catch(err => {

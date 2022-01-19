@@ -1,4 +1,6 @@
-# Otus Highload Social
+# Otus Highload Social Network
+
+Project for the OTUS Highload Architect course
 
 ## Run Test Database in Docker
 
