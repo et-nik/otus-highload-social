@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
 
-axios.defaults.baseURL = 'http://otus-social.knik.space'
+axios.defaults.baseURL = 'https://api.otus-social.knik.space'
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 const token = localStorage.getItem('token')
