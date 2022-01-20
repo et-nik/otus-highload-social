@@ -5,11 +5,11 @@ ENV APPDIR /app
 RUN mkdir -p ${APPDIR}
 WORKDIR ${APPDIR}
 
-COPY ./pkg/http/web/app/package.json .
+COPY ./website/package.json .
 
 RUN yarn install
 
-COPY ./pkg/http/web/app/ .
+COPY ./website/ .
 
 RUN yarn build
 
