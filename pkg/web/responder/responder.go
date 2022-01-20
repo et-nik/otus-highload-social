@@ -43,7 +43,7 @@ func WriteError(writer http.ResponseWriter, _ *http.Request, err error) {
 	}
 }
 
-func WriteJson(writer http.ResponseWriter, request *http.Request, data interface{}) {
+func WriteJSON(writer http.ResponseWriter, request *http.Request, data interface{}) {
 	result, err := json.Marshal(data)
 	if err != nil {
 		WriteError(

@@ -119,5 +119,5 @@ func (handler *SignInHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 		User:      user,
 	}
 
-	responder.WriteJson(writer, request, r)
+	responder.WriteJSON(writer, request, r)
 }

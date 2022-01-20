@@ -18,5 +18,5 @@ func NewProfileHandler(c *di.Container) *ProfileHandler {
 
 func (handler *ProfileHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	session := sessionFromContext(request.Context())
-	responder.WriteJson(writer, request, session.User)
+	responder.WriteJSON(writer, request, session.User)
 }

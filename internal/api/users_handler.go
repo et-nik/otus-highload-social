@@ -28,5 +28,5 @@ func (handler *UsersHandler) ServeHTTP(writer http.ResponseWriter, request *http
 		return
 	}
 
-	responder.WriteJson(writer, request, users)
+	responder.WriteJSON(writer, request, users)
 }

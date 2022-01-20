@@ -4,7 +4,7 @@ import sq "github.com/Masterminds/squirrel"
 
 const (
 	usersTable      = "users"
-	usersTableAlias = "users u"
+	usersTableAlias = usersTable + " u"
 )
 
 type UserQuery struct {

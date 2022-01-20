@@ -31,5 +31,5 @@ func (handler *ProfileFriendsHandler) ServeHTTP(writer http.ResponseWriter, requ
 		return
 	}
 
-	responder.WriteJson(writer, request, friends)
+	responder.WriteJSON(writer, request, friends)
 }
