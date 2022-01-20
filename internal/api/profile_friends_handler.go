@@ -1,11 +1,12 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/et-nik/otus-highload/internal/di"
 	"github.com/et-nik/otus-highload/internal/domain"
+	"github.com/et-nik/otus-highload/pkg/web"
+	"github.com/et-nik/otus-highload/pkg/web/responder"
 )
 
 type ProfileFriendsHandler struct {
@@ -22,18 +23,13 @@ func (handler *ProfileFriendsHandler) ServeHTTP(writer http.ResponseWriter, requ
 	ff := newFriendsFinder(handler.userRepository)
 	friends, err := ff.findFriendsForUser(request.Context(), session.User.Friends)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed to find friends"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewServerInternalError(err, "failed to find friends"),
+		)
 		return
 	}
 
-	result, err := json.Marshal(friends)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed to marshal friends"))
-		return
-	}
-
-	writer.WriteHeader(http.StatusOK)
-	_, _ = writer.Write(result)
+	responder.WriteJson(writer, request, friends)
 }

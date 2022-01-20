@@ -9,32 +9,9 @@ import (
 	"strings"
 
 	"github.com/et-nik/otus-highload/internal/domain"
+	"github.com/et-nik/otus-highload/internal/repositories/query"
 	"github.com/pkg/errors"
 )
-
-const queryFind = `
-	SELECT users.id, users.auth_token_hash, users.age, users.email, users.password, users.name, users.surname, users.sex, 
-	       users.city, users.interests, group_concat(users_friends.target_id) as friend_ids FROM users
-	LEFT JOIN users_friends ON users_friends.source_id = users.id
-	GROUP BY users.id;
-`
-
-const queryFindByID = `
-	SELECT users.id, users.auth_token_hash, users.age, users.email, users.password, users.name, users.surname, users.sex, 
-	       users.city, users.interests, group_concat(users_friends.target_id) as friend_ids FROM users
-		LEFT JOIN users_friends ON users_friends.source_id = users.id
-		WHERE users.id = ?
-		GROUP BY users.id;
-
-`
-
-const queryFindByEmail = `
-	SELECT users.id, users.auth_token_hash, users.age, users.email, users.password, users.name, users.surname, users.sex, 
-	       users.city, users.interests, group_concat(users_friends.target_id) as friend_ids FROM users
-		LEFT JOIN users_friends ON users_friends.source_id = users.id
-		WHERE users.email = ?
-		GROUP BY users.id;
-`
 
 type UserRepository struct {
 	connection *sql.DB
@@ -45,7 +22,12 @@ func NewUserRepository(connection *sql.DB) *UserRepository {
 }
 
 func (repository *UserRepository) Find(ctx context.Context) ([]*domain.User, error) {
-	rows, err := repository.connection.QueryContext(ctx, queryFind)
+	sqlQuery, _, err := query.User().SelectAll().ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := repository.connection.QueryContext(ctx, sqlQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -68,13 +50,23 @@ func (repository *UserRepository) Find(ctx context.Context) ([]*domain.User, err
 
 // FindByEmail TODO: Replace to Find with criteria.
 func (repository *UserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
-	row := repository.connection.QueryRowContext(ctx, queryFindByEmail, email)
+	sqlQuery, _, err := query.User().SelectOneByEmail(email).ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	row := repository.connection.QueryRowContext(ctx, sqlQuery, email)
 
 	return repository.scan(row)
 }
 
 func (repository *UserRepository) FindByID(ctx context.Context, id int) (*domain.User, error) {
-	row := repository.connection.QueryRowContext(ctx, queryFindByID, id)
+	sqlQuery, _, err := query.User().SelectOneByID(id).ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	row := repository.connection.QueryRowContext(ctx, sqlQuery, id)
 
 	return repository.scan(row)
 }

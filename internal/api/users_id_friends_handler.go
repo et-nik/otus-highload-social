@@ -2,12 +2,12 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/et-nik/otus-highload/internal/di"
 	"github.com/et-nik/otus-highload/internal/domain"
+	"github.com/et-nik/otus-highload/pkg/web/responder"
 	"github.com/gorilla/mux"
 )
 
@@ -49,15 +49,7 @@ func (handler *UsersIDFriendsHandler) ServeHTTP(writer http.ResponseWriter, requ
 		return
 	}
 
-	result, err := json.Marshal(friends)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed to marshal friends"))
-		return
-	}
-
-	writer.WriteHeader(http.StatusOK)
-	_, _ = writer.Write(result)
+	responder.WriteJson(writer, request, friends)
 }
 
 type friendsFinder struct {

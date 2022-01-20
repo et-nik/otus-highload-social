@@ -1,12 +1,13 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/et-nik/otus-highload/internal/di"
 	"github.com/et-nik/otus-highload/internal/domain"
+	"github.com/et-nik/otus-highload/pkg/web"
+	"github.com/et-nik/otus-highload/pkg/web/responder"
 	"github.com/gorilla/mux"
 )
 
@@ -30,8 +31,11 @@ func (handler *UsersIDHandler) ServeHTTP(writer http.ResponseWriter, request *ht
 
 	user, err := handler.userRepository.FindByID(request.Context(), id)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed to find user"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewServerInternalError(err, "failed to find user"),
+		)
 		return
 	}
 
@@ -41,12 +45,5 @@ func (handler *UsersIDHandler) ServeHTTP(writer http.ResponseWriter, request *ht
 		return
 	}
 
-	result, err := json.Marshal(user)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed to marshal user"))
-		return
-	}
-
-	_, _ = writer.Write(result)
+	responder.WriteJson(writer, request, user)
 }

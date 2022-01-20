@@ -1,0 +1,7 @@
+GET {{host}}/users
+Authorization: Bearer {{authToken}}
+
+
+###
+GET {{host}}/users?limit=10&start=1
+Authorization: Bearer {{authToken}}

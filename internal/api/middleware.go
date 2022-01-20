@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/et-nik/otus-highload/internal/domain"
+	"github.com/et-nik/otus-highload/pkg/web"
+	"github.com/et-nik/otus-highload/pkg/web/responder"
 )
 
 var (
@@ -23,8 +25,11 @@ func NewAuthMiddleware(
 
 		token, err := parseToken(authorization)
 		if err != nil {
-			writer.WriteHeader(http.StatusUnauthorized)
-			_, _ = writer.Write([]byte("unauthorized"))
+			responder.WriteError(
+				writer,
+				request,
+				web.NewError(err, http.StatusUnauthorized, "unauthorized"),
+			)
 			return
 		}
 
@@ -75,11 +80,4 @@ func parseToken(authHeader string) (*token, error) {
 		UserID:   userID,
 		AuthHash: t[1],
 	}, nil
-}
-
-func CORSMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		writer.Header().Set("Access-Control-Allow-Origin", "*")
-		next.ServeHTTP(writer, request)
-	})
 }

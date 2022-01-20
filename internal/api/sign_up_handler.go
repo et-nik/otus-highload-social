@@ -9,6 +9,8 @@ import (
 
 	"github.com/et-nik/otus-highload/internal/di"
 	"github.com/et-nik/otus-highload/internal/domain"
+	"github.com/et-nik/otus-highload/pkg/web"
+	"github.com/et-nik/otus-highload/pkg/web/responder"
 	"github.com/matthewhartstonge/argon2"
 )
 
@@ -39,27 +41,39 @@ func (handler *SignUpHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 	decoder := json.NewDecoder(request.Body)
 	err := decoder.Decode(&command)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		_, _ = writer.Write([]byte("invalid request"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewError(err, http.StatusBadRequest, "invalid request"),
+		)
 		return
 	}
 
 	existsUser, err := handler.userRepository.FindByEmail(request.Context(), command.Email)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewServerInternalError(err, "failed"),
+		)
 		return
 	}
 	if existsUser != nil {
-		writer.WriteHeader(http.StatusUnprocessableEntity)
-		_, _ = writer.Write([]byte("user is already exists"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewError(err, http.StatusUnprocessableEntity, "user is already exists"),
+		)
 		return
 	}
 
 	passwordHash, err := handler.argon.HashEncoded([]byte(command.Password))
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewServerInternalError(err, "failed"),
+		)
 		return
 	}
 
@@ -77,8 +91,11 @@ func (handler *SignUpHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 	b := make([]byte, 256)
 	_, err = rand.Read(b)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewServerInternalError(err, "failed"),
+		)
 		return
 	}
 
@@ -86,8 +103,11 @@ func (handler *SignUpHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 
 	err = handler.userRepository.Save(request.Context(), user)
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed to save user"))
+		responder.WriteError(
+			writer,
+			request,
+			web.NewServerInternalError(err, "failed to save user"),
+		)
 		return
 	}
 
@@ -99,13 +119,5 @@ func (handler *SignUpHandler) ServeHTTP(writer http.ResponseWriter, request *htt
 		User:      user,
 	}
 
-	result, err := json.Marshal(r)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		_, _ = writer.Write([]byte("failed to marshal result"))
-		return
-	}
-
-	writer.WriteHeader(http.StatusOK)
-	_, _ = writer.Write(result)
+	responder.WriteJson(writer, request, r)
 }

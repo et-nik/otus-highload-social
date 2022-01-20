@@ -6,6 +6,8 @@ import (
 
 	"github.com/et-nik/otus-highload/internal/di"
 	"github.com/et-nik/otus-highload/internal/domain"
+	"github.com/et-nik/otus-highload/pkg/web"
+	"github.com/et-nik/otus-highload/pkg/web/responder"
 )
 
 type FollowUserHandler struct {
@@ -16,30 +18,28 @@ func NewFollowUserHandler(c *di.Container) *FollowUserHandler {
 	return &FollowUserHandler{userRepository: c.UserRepository()}
 }
 
-func (handler *FollowUserHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (handler *FollowUserHandler) ServeHTTP(wr http.ResponseWriter, rq *http.Request) {
 	var command struct {
 		ID int `json:"id"`
 	}
 
-	decoder := json.NewDecoder(request.Body)
+	decoder := json.NewDecoder(rq.Body)
 	err := decoder.Decode(&command)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		_, _ = writer.Write([]byte("invalid request"))
+		responder.WriteError(wr, rq, web.NewError(err, http.StatusBadRequest, "invalid request"))
 		return
 	}
 
-	session := sessionFromContext(request.Context())
+	session := sessionFromContext(rq.Context())
 	user := session.User
 
 	user.Friends = append(user.Friends, command.ID)
 
-	err = handler.userRepository.Save(request.Context(), user)
+	err = handler.userRepository.Save(rq.Context(), user)
 	if err != nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		_, _ = writer.Write([]byte("failed to save user"))
+		responder.WriteError(wr, rq, web.NewServerInternalError(err, "failed to save user"))
 		return
 	}
 
-	writer.WriteHeader(http.StatusOK)
+	wr.WriteHeader(http.StatusOK)
 }
